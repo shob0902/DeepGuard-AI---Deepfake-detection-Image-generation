@@ -1,0 +1,635 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepGuard AI</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+  html {
+    scroll-behavior: smooth;
+  }
+</style>
+
+
+</head>
+
+<body class="antialiased selection:bg-white/20 selection:text-white bg-[#050505] text-white overflow-x-hidden" style="font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji','Segoe UI Emoji';">
+  <!-- Cursor Particle -->
+  <div id="cursor-particle" class="fixed w-6 h-6 rounded-full pointer-events-none z-[100] mix-blend-screen transition-opacity duration-300 opacity-0 hidden md:block" style="will-change: transform; left: 0; top: 0; transform: translate(-50%, -50%); filter: blur(0.25rem); background: rgb(130, 130, 132);">
+  </div>
+
+  <!-- 3D Background Canvas -->
+  <canvas id="starfield" class="fixed inset-0 w-full h-full z-0 pointer-events-auto"></canvas>
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-6 md:px-12 transition-all duration-500" id="navbar">
+    <div class="flex items-center gap-2 mix-blend-difference">
+      <div class="w-4 h-4 bg-white rounded-sm flex items-center justify-center rotate-45">
+        <div class="w-1.5 h-1.5 bg-black rounded-full"></div>
+      </div>
+      <span class="text-sm font-semibold tracking-tight uppercase text-white">
+        DeepGuard AI
+      </span>
+    </div>
+
+    <div class="hidden md:flex gap-8 text-xs font-medium text-zinc-400 uppercase tracking-widest mix-blend-exclusion">
+      <a href="#about" class="hover:text-white transition-colors">About</a>
+      <a href="#services" class="hover:text-white transition-colors">More Services</a>
+    </div>
+
+    <a href="#contact" class="group flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-xs font-medium text-white" style="backdrop-filter: blur(12px);">
+      <span>Connect</span>
+      <iconify-icon icon="solar:arrow-right-linear" class="w-3 h-3 transition-transform group-hover:translate-x-0.5" style="stroke-width: 1.5;"></iconify-icon>
+    </a>
+  </nav>
+
+  <!-- 3D Hero Section (Fixed during initial scroll) -->
+  <div id="hero-container" class="fixed inset-0 flex items-center justify-center z-10">
+    <div id="hero-content" class="text-center px-4" style="transform-style: preserve-3d; will-change: transform, opacity;">
+      <h1 class="text-5xl sm:text-6xl md:text-8xl font-semibold tracking-tight text-white mb-6">
+        DeepFake <span class="text-zinc-500">Detection.</span>
+      </h1>
+
+      <p class="text-sm md:text-lg text-zinc-400 max-w-xl mx-auto font-light leading-relaxed mb-10">
+        AI system that detects deepfake and synthetic images.
+        <br class="hidden md:block">
+        Powered by deep learning authenticity analysis.
+      </p>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scroll Spacer -->
+  <div class="relative z-10" style="height: 100vh;"></div>
+
+  <!-- Main Content -->
+  <main class="relative z-20 bg-[#050505] border-t border-white/5" style="box-shadow: 0 -50px 100px rgba(0,0,0,1);">
+
+
+    <!-- IMAGE UPLOAD SECTION -->
+<section id="uploadSection" class="py-24 px-6 relative z-20">
+  <div class="max-w-3xl mx-auto text-center">
+    <h2 class="text-5xl sm:text-6xl md:text-8xl font-semibold tracking-tight text-white mb-6">
+        DeepGuard<span class="text-zinc-500">AI</span>
+      </h2>
+    <p class="text-zinc-500 text-sm mb-10">Upload an image to check whether it is real or AI-generated.</p>
+
+    <div class="container">
+      <input 
+  type="file" 
+  id="imageInput" 
+  accept="image/*" 
+  onchange="previewImage()" 
+  style="display: none;"
+/>
+
+<label for="imageInput"
+  style="
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    border: 2px dashed #505851;
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    color: #e0e7ff;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 12px rgba(80, 82, 80, 0.63);
+    letter-spacing: 0.4px;
+  "
+>Upload Image
+</label>
+
+
+
+      <img 
+  id="preview" 
+  src="" 
+  alt="Image Preview"
+  style="
+    width: 100%;
+    max-height: 260px;
+    object-fit: contain;
+    margin: 18px 0;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    display: none;
+    background: rgba(255,255,255,0.05);
+    padding: 6px;
+  "
+/>
+
+<button 
+  onclick="sendImage()"
+  style="
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #3b3f3a, #424242);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 18px rgba(56, 57, 87, 0.4);
+  "
+>
+  Detect
+</button>
+
+<p 
+  id="result"
+  style="
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    min-height: 26px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    letter-spacing: 0.3px;
+  "
+></p>
+
+    </div>
+    
+  </div>
+</section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 md:py-32 px-6 md:px-12 relative">
+      <div class="max-w-7xl mx-auto grid md:grid-cols-12 gap-12 md:gap-16 items-start">
+        <div class="md:col-span-7">
+          <h2 class="text-3xl md:text-5xl font-medium tracking-tight mb-8">
+            Not just detection.
+            <br>
+            AI-powered media verification.
+          </h2>
+          <p class="text-zinc-400 text-base md:text-lg leading-relaxed mb-12 font-light">
+            We move beyond traditional web design. We construct digital environments that respond, adapt, and perform. Bridging the gap between raw code and human experience.
+          </p>
+
+          <div class="grid grid-cols-2 gap-10 md:gap-12 border-t border-white/10 pt-12">
+            <div>
+              <span class="block text-4xl font-semibold text-white tracking-tight">CNN Model</span>
+              <span class="text-xs text-zinc-600 uppercase tracking-widest mt-2 block">Deepfake Classifier</span>
+            </div>
+            <div>
+              <span class="block text-4xl font-semibold text-white tracking-tight">Image AI</span>
+              <span class="text-xs text-zinc-600 uppercase tracking-widest mt-2 block">Authenticity Analysis</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="md:col-span-5 space-y-4 pt-4">
+          <div class="p-8 rounded-xl border border-white/5 border-l-2 border-l-indigo-500 bg-white/5" style="backdrop-filter: blur(12px); background: rgba(255,255,255,0.02);">
+            <iconify-icon icon="solar:box-linear" class="w-6 h-6 text-white mb-4" style="stroke-width: 1.5;"></iconify-icon>
+            <h3 class="text-lg font-medium text-white">Deep Learning Detection</h3>
+            <p class="text-sm text-zinc-500 mt-2">
+              A convolutional neural network analyzes image patterns, textures, and anomalies commonly found in AI-generated faces.
+            </p>
+          </div>
+
+          <div class="p-8 rounded-xl border border-white/5 border-l-2 border-l-zinc-700 bg-white/5" style="backdrop-filter: blur(12px); background: rgba(255,255,255,0.02);">
+            <iconify-icon icon="solar:box-linear" class="w-6 h-6 text-white mb-4" style="stroke-width: 1.5;"></iconify-icon>
+            <h3 class="text-lg font-medium text-white">Web-Based AI Interface</h3>
+            <p class="text-sm text-zinc-500 mt-2">
+              Users upload images through a responsive web interface, and the backend processes them using a trained deepfake detection model.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="py-24 md:py-32 px-6 md:px-12 border-t border-white/5" style="background: rgba(24,24,27,0.2);">
+      <div class="max-w-5xl mx-auto">
+  <div class="mb-16 md:mb-20 text-center">
+    <h2 class="text-3xl md:text-4xl font-medium tracking-tight">AI Capabilities</h2>
+  </div>
+
+  <!-- CENTERED GRID WITH SPACING -->
+  <div class="grid md:grid-cols-2 gap-10 justify-center">
+
+    <!-- CARD 1 -->
+    <div class="group p-10 border border-white/5 transition-all duration-300 relative overflow-hidden rounded-2xl"
+      style="background: rgba(255,255,255,0.02);">
+
+      <h3 class="text-lg font-medium mb-3">Video Deepfake Detection</h3>
+      <p class="text-sm text-zinc-500 leading-relaxed mb-8">
+        Detects manipulated faces and synthetic alterations in videos using temporal and spatial deep learning analysis.
+      </p>
+
+      <div class="flex justify-center">
+        <button type="button"
+          class="px-8 py-3 bg-white text-black rounded-full font-medium text-xs hover:bg-zinc-200 transition-colors tracking-wide">
+          Detect
+        </button>
+      </div>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="group p-10 border border-white/5 transition-all duration-300 relative overflow-hidden rounded-2xl"
+      style="background: rgba(255,255,255,0.02);">
+
+      <h3 class="text-lg font-medium mb-3">Deepfake Image Generation</h3>
+      <p class="text-sm text-zinc-500 leading-relaxed mb-8">
+        Uses generative AI models to create synthetic faces for research and testing detection systems.
+      </p>
+
+      <div class="flex justify-center">
+        <button type="button"
+          class="px-8 py-3 bg-white text-black rounded-full font-medium text-xs hover:bg-zinc-200 transition-colors tracking-wide">
+          Generate
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    </section>
+
+    
+
+    <!-- Contact -->
+    <section id="contact" class="py-24 md:py-32 px-6 md:px-12 border-t border-white/5" style="background: linear-gradient(to bottom, #050505, #0a0a0a);">
+      <div class="max-w-xl mx-auto">
+        <div class="text-center mb-12 md:mb-16">
+          <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-4">Initialize Collaboration</h2>
+          <p class="text-zinc-500 text-sm">Fill out the parameters below to start the sequence.</p>
+        </div>
+
+        <form class="space-y-8" onsubmit="return false;">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="group relative">
+              <input type="text" id="name" required="" class="peer w-full bg-transparent border-b border-zinc-800 py-3 text-sm focus:outline-none focus:border-white transition-colors placeholder-transparent text-white" placeholder="Name">
+              <label for="name" class="absolute left-0 top-3 text-zinc-500 text-xs transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:text-zinc-600 peer-placeholder-shown:top-3 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-zinc-400 peer-valid:-top-2 peer-valid:text-xs peer-valid:text-zinc-400">
+                Name
+              </label>
+            </div>
+
+            <div class="group relative">
+              <input type="email" id="email" required="" class="peer w-full bg-transparent border-b border-zinc-800 py-3 text-sm focus:outline-none focus:border-white transition-colors placeholder-transparent text-white" placeholder="Email">
+              <label for="email" class="absolute left-0 top-3 text-zinc-500 text-xs transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:text-zinc-600 peer-placeholder-shown:top-3 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-zinc-400 peer-valid:-top-2 peer-valid:text-xs peer-valid:text-zinc-400">
+                Email
+              </label>
+            </div>
+          </div>
+
+          <div class="space-y-4 pt-4">
+            <div class="flex justify-between text-xs text-zinc-500 uppercase tracking-widest">
+              <label for="budgetRange">Budget Range</label>
+              <span id="budgetValue">$5k</span>
+            </div>
+            <input type="range" min="1000" max="50000" step="1000" value="5000" class="w-full" id="budgetRange" style="appearance: none; background: transparent;">
+            <div class="h-1 rounded-full" style="background: #27272a;"></div>
+          </div>
+
+          <div class="group relative pt-4">
+            <textarea id="message" rows="1" required="" class="peer w-full bg-transparent border-b border-zinc-800 py-3 text-sm focus:outline-none focus:border-white transition-colors placeholder-transparent text-white resize-none" placeholder="Brief"></textarea>
+            <label for="message" class="absolute left-0 top-7 text-zinc-500 text-xs transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:text-zinc-600 peer-placeholder-shown:top-7 peer-focus:top-2 peer-focus:text-xs peer-focus:text-zinc-400 peer-valid:top-2 peer-valid:text-xs peer-valid:text-zinc-400">
+              Project Brief
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 pt-4">
+            <input type="checkbox" id="terms" class="appearance-none h-3.5 w-3.5 border border-zinc-700 rounded bg-transparent focus:outline-none cursor-pointer transition-colors" style="background-size: 100% 100%; background-position: center; background-repeat: no-repeat;">
+            <label for="terms" class="text-xs text-zinc-500 select-none cursor-pointer">
+              Confidentiality Agreement Accepted
+            </label>
+          </div>
+
+          <button type="button" class="w-full text-white font-medium py-4 rounded hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2 mt-8 text-sm tracking-wide border border-white/10 bg-white/5" style="backdrop-filter: blur(12px); background: rgba(255,255,255,0.02);">
+            Submit Request
+            <iconify-icon icon="solar:arrow-right-linear" class="w-4 h-4" style="stroke-width: 1.5;"></iconify-icon>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <footer class="py-8 border-t border-white/5 text-center">
+      <p class="text-xs text-zinc-700 uppercase tracking-widest">
+        © 2026 SHOBHIT SHOURYA | DEVELOPER
+      </p>
+    </footer>
+  </main>
+
+
+  
+
+  <script>
+  
+    // Explore button
+    document.getElementById('exploreBtn')?.addEventListener('click', () => {
+      document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Budget Slider label
+    const range = document.getElementById('budgetRange');
+    const valueDisplay = document.getElementById('budgetValue');
+
+    function formatBudget(val) {
+      const v = parseInt(val, 10);
+      if (v >= 50000) return '$50k+';
+      return '$' + (v / 1000) + 'k';
+    }
+    valueDisplay.textContent = formatBudget(range.value);
+
+    range.addEventListener('input', (e) => {
+      valueDisplay.textContent = formatBudget(e.target.value);
+    });
+
+    // Custom checkbox visuals
+    const terms = document.getElementById('terms');
+    function paintCheckbox() {
+      if (terms.checked) {
+        terms.style.backgroundColor = '#ffffff';
+        terms.style.borderColor = '#ffffff';
+        terms.style.backgroundImage =
+          "url(\"data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='black' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e\")";
+      } else {
+        terms.style.backgroundColor = 'transparent';
+        terms.style.borderColor = '#3f3f46';
+        terms.style.backgroundImage = 'none';
+      }
+    }
+    terms.addEventListener('change', paintCheckbox);
+    paintCheckbox();
+
+    // Auto-expand textarea
+    const tx = document.getElementById('message');
+    tx.addEventListener('input', function () {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    });
+
+    // ----------------------------------------------------
+    // Starfield + hero depth scroll
+    // ----------------------------------------------------
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    const heroContent = document.getElementById('hero-content');
+    const cursor = document.getElementById('cursor-particle');
+
+    let width, height;
+    let stars = [];
+    let scrollY = 0;
+    let speed = 0;
+    let targetSpeed = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    const STAR_COUNT = 800;
+    const FOV = 400;
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      if (mouseX === 0) {
+        mouseX = width / 2;
+        mouseY = height / 2;
+      }
+    }
+
+    class Star {
+      constructor() {
+        this.x = (Math.random() - 0.5) * width * 2;
+        this.y = (Math.random() - 0.5) * height * 2;
+        this.z = Math.random() * FOV;
+        this.size = Math.random() * 0.5 + 0.5;
+      }
+      update() {
+        const movement = 0.5 + (speed * 10);
+        this.z -= movement;
+        if (this.z <= 1) {
+          this.z = FOV;
+          this.x = (Math.random() - 0.5) * width * 2;
+          this.y = (Math.random() - 0.5) * height * 2;
+        }
+      }
+      draw() {
+        const scale = FOV / this.z;
+        const x2d = this.x * scale;
+        const y2d = this.y * scale;
+
+        const trailZ = this.z + (speed * 20) + 2;
+        const scaleTrail = FOV / trailZ;
+        const x2dTrail = this.x * scaleTrail;
+        const y2dTrail = this.y * scaleTrail;
+
+        const alpha = (1 - this.z / FOV);
+
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.8})`;
+        ctx.lineWidth = this.size * scale;
+        ctx.moveTo(x2dTrail, y2dTrail);
+        ctx.lineTo(x2d, y2d);
+        ctx.stroke();
+      }
+    }
+
+    function initStars() {
+      stars = [];
+      for (let i = 0; i < STAR_COUNT; i++) stars.push(new Star());
+    }
+
+    function animate() {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.fillStyle = '#050505';
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = 'rgba(5, 5, 5, 0.4)';
+      ctx.fillRect(0, 0, width, height);
+
+      const cx = width / 2 + (width / 2 - mouseX) * 0.05;
+      const cy = height / 2 + (height / 2 - mouseY) * 0.05;
+      ctx.translate(cx, cy);
+
+      speed += (targetSpeed - speed) * 0.1;
+
+      for (let i = 0; i < stars.length; i++) {
+        stars[i].update();
+        stars[i].draw();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      if (cursor) {
+        cursor.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+        cursor.style.opacity = '1';
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      scrollY = window.scrollY;
+
+      if (scrollY < 1000) targetSpeed = Math.min(scrollY / 500, 2);
+      else targetSpeed = 0.1;
+
+      const perspectiveLimit = 800;
+      if (scrollY < perspectiveLimit) {
+        const progress = scrollY / perspectiveLimit;
+        const zMove = scrollY * 2.5;
+        const opacity = Math.max(0, 1 - (progress * 1.5));
+        const blur = progress * 10;
+
+        heroContent.style.transform = `translate3d(0, 0, ${zMove}px)`;
+        heroContent.style.opacity = opacity;
+        heroContent.style.filter = `blur(${blur}px)`;
+        heroContent.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      resize();
+      initStars();
+    });
+
+    // Custom range styling (thumb + track)
+    function paintRange() {
+      try {
+        const style = document.createElement('style');
+        style.textContent = `
+          #budgetRange::-webkit-slider-thumb{
+            -webkit-appearance:none;
+            height:14px;width:14px;border-radius:9999px;background:#ffffff;
+            margin-top:-5px;cursor:pointer; box-shadow:0 0 10px rgba(255,255,255,0.5);
+          }
+          #budgetRange::-webkit-slider-runnable-track{
+            width:100%;height:4px;background:#27272a;border-radius:9999px;
+          }
+          #budgetRange::-moz-range-thumb{
+            height:14px;width:14px;border:none;border-radius:9999px;background:#ffffff;
+            cursor:pointer; box-shadow:0 0 10px rgba(255,255,255,0.5);
+          }
+          #budgetRange::-moz-range-track{
+            height:4px;background:#27272a;border-radius:9999px;
+          }
+        `;
+        document.head.appendChild(style);
+      } catch(e) {}
+    }
+
+    resize();
+    initStars();
+    paintRange();
+    animate();
+
+    // ============================================================
+    // CONNECT FRONTEND TO BACKEND - IMAGE UPLOAD AND PREDICTION
+    // ============================================================
+    const checkBtn = document.getElementById('checkBtn');
+    const imageInput = document.getElementById('imageInput');
+    const resultBox = document.getElementById('resultBox');
+
+    checkBtn.addEventListener('click', async function() {
+      if (!imageInput.files || imageInput.files.length === 0) {
+        resultBox.innerHTML = '<span style="color: #ef4444;">Please select an image first</span>';
+        return;
+      }
+
+      const file = imageInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      checkBtn.disabled = true;
+      checkBtn.textContent = 'Analyzing...';
+      resultBox.innerHTML = '<span style="color: #60a5fa;">Processing image...</span>';
+
+      try {
+        const response = await fetch('http://localhost:5000/predict', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          const prediction = data.prediction;
+          const confidence = data.confidence;
+          
+          let resultColor = prediction === 'FAKE' ? '#ef4444' : '#10b981';
+          resultBox.innerHTML = `
+            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+              <p style="font-size: 18px; color: ${resultColor}; font-weight: bold; margin-bottom: 8px;">
+                ${prediction}
+              </p>
+              <p style="color: #a1a5b4; font-size: 14px;">
+                Confidence: ${confidence}%
+              </p>
+            </div>
+          `;
+        } else {
+          resultBox.innerHTML = `<span style="color: #ef4444;">Error: ${data.error}</span>`;
+        }
+      } catch (error) {
+        resultBox.innerHTML = `<span style="color: #ef4444;">Connection error. Make sure the Flask backend is running on http://localhost:5000</span>`;
+        console.error('Error:', error);
+      } finally {
+        checkBtn.disabled = false;
+        checkBtn.textContent = 'Check Authenticity';
+      }
+    });
+
+    function previewImage() {
+        const fileInput = document.getElementById("imageInput");
+        const preview = document.getElementById("preview");
+        const file = fileInput.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      async function sendImage() {
+        const fileInput = document.getElementById("imageInput");
+        const resultText = document.getElementById("result");
+        resultText.textContent = "";
+        resultText.className = "";
+
+        if (!fileInput.files.length) {
+          alert("Please select an image first.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+
+        const response = await fetch("/predict", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        const prediction = data.prediction;
+
+        resultText.textContent = "Prediction: " + prediction;
+        resultText.className = prediction === "Fake" ? "fake" : "real";
+      }
+
+  </script>
+
+</body></html>

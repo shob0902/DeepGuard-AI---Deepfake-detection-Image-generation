@@ -1,0 +1,8 @@
+torch
+torchvision
+torchaudio
+flask
+Flask-Cors
+# For testing the local server
+requests
+# Add other runtime deps here (e.g. pillow, numpy) as needed
