@@ -10,5 +10,10 @@ services:
         value: production
       - key: PORT
         value: 5000
-    healthCheckPath: /
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    healthCheckPath: /health
     autoDeploy: true
+    httpHeaders:
+      - name: X-Frame-Options
+        value: DENY
