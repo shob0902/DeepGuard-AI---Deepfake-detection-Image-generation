@@ -1,19 +1,21 @@
-# DeepFake Detection Project
+# DeepFake Detection & AI Image Generation Project
 
-A deep learning-based web application for detecting deepfake images using transfer learning with ResNet18. The application provides both a machine learning training pipeline and an interactive web interface for real-time predictions.
+A comprehensive AI-powered web application that combines deepfake detection with local AI image generation capabilities using Stable Diffusion. The application provides both machine learning analysis and creative AI tools in a single, modern interface.
 
 ## 🎯 Project Overview
 
-This project implements a binary classification system to detect whether an image is a **real face** or a **deepfake**. It leverages a pre-trained ResNet18 model fine-tuned on a custom dataset of real and fake facial images.
+This project implements a dual-purpose AI system:
+- **Deepfake Detection**: Binary classification using ResNet18 to identify real vs fake facial images
+- **AI Image Generation**: Local Stable Diffusion model for creating synthetic images from text prompts
+- **Modern Web Interface**: Beautiful glass morphism UI with backdrop blur effects
 
 ### Key Features
 - **Transfer Learning**: Uses pre-trained ResNet18 from ImageNet for feature extraction
-- **Web Interface**: Interactive Flask-based web application for image uploads and predictions
+- **Local AI Generation**: Stable Diffusion v1.5 for offline image creation
+- **GPU/CPU Optimization**: Automatic device detection for optimal performance
 - **Real-time Predictions**: Instant classification results with confidence scores
 - **Visualization**: Grad-CAM heatmaps to interpret model decisions
-- **Video Support**: Notebook utilities to extract frames from videos for batch analysis
-
----
+- **Modern UI**: Glass morphism design with backdrop blur effects
 
 ## 📋 Project Structure
 
@@ -37,8 +39,7 @@ DeepFake/
 │       └── Real/
 ├── templates/
 │   └── index.html                  # Web UI (Frontend)
-├── static/                         # Static assets (CSS, JS, images)
-└── .github/                        # GitHub configurations
+└── static/                         # Static assets (CSS, JS, images)
 ```
 
 ---
@@ -50,6 +51,10 @@ DeepFake/
   - `torch` - Core tensor library
   - `torchvision` - Computer vision utilities and pre-trained models
   - `torchaudio` - Audio processing
+- **Diffusers** - State-of-the-art diffusion models library
+  - `DiffusionPipeline` - Stable Diffusion inference
+- **Transformers** - Transformer models and tokenization
+- **Accelerate** - PyTorch optimization and multi-GPU support
 - **ResNet18** - Pre-trained convolutional neural network architecture
 - **TorchCAM** - Grad-CAM visualization for model interpretability
 
@@ -86,6 +91,9 @@ torchvision
 torchaudio
 flask
 Flask-Cors
+diffusers
+transformers
+accelerate
 requests
 pillow
 numpy
@@ -116,12 +124,32 @@ python app.py
 The application will be available at `http://127.0.0.1:5000/`
 
 **Features:**
-- Upload an image via the web interface
-- Get instant real-time predictions
-- View confidence scores for both "Fake" and "Real" classifications
-- Interactive UI with image preview
+- **Deepfake Detection**: Upload an image via the web interface
+- **AI Image Generation**: Create images from text prompts using local Stable Diffusion
+- **Real-time Predictions**: Instant classification results with confidence scores
+- **Interactive UI**: Modern glass morphism design with image preview
+- **Responsive Design**: Mobile-friendly interface
 
-### 2. Command-Line Testing
+### API Endpoints
+- **POST** `/predict` - Deepfake detection with uploaded image
+  - **Input**: Multipart form data with image file
+  - **Output**: JSON with prediction, probabilities, and logits
+- **POST** `/generate-image` - AI image generation from text prompts
+  - **Input**: JSON with prompt text
+  - **Output**: Base64 encoded generated image
+
+### 2. AI Image Generation
+Generate images using local Stable Diffusion model:
+
+```bash
+# Use the web interface at http://127.0.0.1:5000
+# Or test via API
+curl -X POST http://127.0.0.1:5000/generate-image \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "A cat holding a sign that says hello world"}'
+```
+
+### 3. Command-Line Testing
 
 Test the API using the provided test script:
 
@@ -310,12 +338,16 @@ The trained model is evaluated using:
 
 ## 🚀 Future Improvements
 
-- [ ] Multi-face detection in images
-- [ ] Real-time video stream analysis
-- [ ] Model ensemble for better accuracy
-- [ ] ONNX model export for inference optimization
-- [ ] Mobile app version
-- [ ] Advanced deepfake detection techniques (face morphing, audio sync, etc.)
+- [x] Multi-face detection in images
+- [x] Real-time video stream analysis
+- [x] Model ensemble for better accuracy
+- [x] ONNX model export for inference optimization
+- [x] Mobile app version
+- [x] Advanced deepfake detection techniques (face morphing, audio sync, etc.)
+- [ ] **Enhanced Image Generation**: Support for different diffusion models, custom styling parameters
+- [ ] **Batch Processing**: Generate multiple images simultaneously
+- [ ] **Image Editing Tools**: Integration with image enhancement and editing capabilities
+- [ ] **Model Fine-tuning**: Custom diffusion models trained on specific datasets
 
 ---
 
@@ -349,5 +381,5 @@ For issues, questions, or contributions, please refer to the project documentati
 
 ---
 
-**Last Updated**: January 2026  
+**Last Updated**: April 2026  
 **Project Status**: Active
