@@ -95,14 +95,34 @@ def generate_image():
     except Exception as e:
         return jsonify({'error': f'Stable Diffusion Generation Error: {str(e)}'}), 500
 
-# Load model
-model = models.resnet18(pretrained=False)
-num_ftrs = model.fc.in_features
-model.fc = torch.nn.Linear(num_ftrs, 2)
+# Load model (with cloud download support)
+def load_model():
+    model_path = 'best_deepfake_resnet18.pth'
+    
+    # Download model if not exists (for cloud deployment)
+    if not os.path.exists(model_path):
+        try:
+            print("Downloading model from cloud storage...")
+            model_url = os.environ.get('MODEL_URL', 
+                'https://github.com/shob0902/Deepfake-Detection-Model/raw/main/best_deepfake_resnet18.pth')
+            response = requests.get(model_url, timeout=300)
+            with open(model_path, 'wb') as f:
+                f.write(response.content)
+            print("Model downloaded successfully!")
+        except Exception as e:
+            print(f"Error downloading model: {e}")
+            raise
+    
+    model = models.resnet18(pretrained=False)
+    num_ftrs = model.fc.in_features
+    model.fc = torch.nn.Linear(num_ftrs, 2)
+    
+    checkpoint = torch.load(model_path, map_location="cpu")
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model.eval()
+    return model
 
-checkpoint = torch.load('best_deepfake_resnet18.pth', map_location="cpu")
-model.load_state_dict(checkpoint['model_state_dict'])
-model.eval()
+model = load_model()
 
 # Class names
 class_names = ['Fake', 'Real']
@@ -148,4 +168,6 @@ def predict():
     })
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    # Production configuration for Render
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
